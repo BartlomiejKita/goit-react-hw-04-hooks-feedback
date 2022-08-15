@@ -1,11 +1,13 @@
 import { Component } from 'react';
+import Statistics from './Statistics';
+import FeedbackOptions from './FeedbackOptions';
+import Section from './Section';
+import Notification from './Notification';
 class App extends Component {
   state = {
     good: 0,
     neutral: 0,
     bad: 0,
-    total: 0,
-    positiveFeedback: 0,
   };
 
   handleIncrement = evt => {
@@ -14,46 +16,47 @@ class App extends Component {
     this.setState(state => ({
       [key]: state[key] + 1,
     }));
-
-    this.countTotalFeedback();
-    this.countPositiveFeedbackPercentage();
   };
 
-  countTotalFeedback = () => {
-    this.setState(({ good, neutral, bad }) => ({
-      total: good + neutral + bad,
-    }));
+  countTotalFeedback = state => {
+    return Object.values(state).reduce(
+      (total, element) => (total += element),
+      0
+    );
   };
 
-  countPositiveFeedbackPercentage = () => {
-    this.setState(({ good, total }) => ({
-      positiveFeedback: Math.round((good / total) * 100),
-    }));
+  countPositiveFeedbackPercentage = (good, total) => {
+    const positive = Math.round((good / total) * 100);
+    return isNaN(positive) ? 0 : positive;
   };
 
   render() {
-    const { good, neutral, bad, total, positiveFeedback } = this.state;
+    const { good, neutral, bad } = this.state;
+    const total = this.countTotalFeedback(this.state);
+    const positivePercentage = this.countPositiveFeedbackPercentage(
+      good,
+      total
+    );
+    const btnNames = Object.keys(this.state);
     return (
-      <div>
-        <h1>Please leave feedback</h1>
-        <button type="button" onClick={this.handleIncrement}>
-          good
-        </button>
-        <button type="button" onClick={this.handleIncrement}>
-          neutral
-        </button>
-        <button type="button" onClick={this.handleIncrement}>
-          bad
-        </button>
-        <h2>Statistics</h2>
-        <ul>
-          <li>Good: {good}</li>
-          <li>Neutral: {neutral}</li>
-          <li>Bad: {bad}</li>
-          <li>Total: {total}</li>
-          <li>Positive feedback: {positiveFeedback}%</li>
-        </ul>
-      </div>
+      <>
+        <Section title="Please leave feedback">
+          <FeedbackOptions
+            options={btnNames}
+            onLeaveFeedback={this.handleIncrement}
+          ></FeedbackOptions>
+        </Section>
+        <Section title="Statistics">
+          {total === 0 ? <Notification message="There is no feedback"></Notification> :
+            <Statistics
+              good={good}
+              neutral={neutral}
+              bad={bad}
+              total={total}
+              positivePercentage={positivePercentage}
+            ></Statistics>}
+        </Section>
+      </>
     );
   }
 }

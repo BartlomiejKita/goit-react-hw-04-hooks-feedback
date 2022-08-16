@@ -44,10 +44,10 @@ class App extends Component {
           <FeedbackOptions
             options={btnNames}
             onLeaveFeedback={this.handleIncrement}
-          ></FeedbackOptions>
+          />
         </Section>
         <Section title="Statistics">
-          {total === 0 ? <Notification message="There is no feedback"></Notification> :
+          {total === 0 ? <Notification message="There is no feedback"/> :
             <Statistics
               good={good}
               neutral={neutral}

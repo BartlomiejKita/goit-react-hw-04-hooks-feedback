@@ -12,12 +12,9 @@ const initialValue = {
 
 const reducer = (state, action) => {
   switch (action.type) {
-    case 'good':
-      return { ...state, good: state.good + 1 };
-    case 'bad':
-      return { ...state, bad: state.bad + 1 };
-    case 'neutral':
-      return { ...state, neutral: state.neutral + 1 };
+    case 'increment':
+      return { ...state, [action.payload.key]: state[action.payload.key] + 1 };
+
     default:
       throw new Error();
   }
@@ -26,7 +23,11 @@ const reducer = (state, action) => {
 const App = () => {
   const [state, dispatch] = useReducer(reducer, initialValue);
 
-  const handleIncrement = evt => dispatch({ type: evt.target.textContent });
+  const handleIncrement = evt =>
+    dispatch({
+      type: 'increment',
+      payload: { key: evt.target.textContent },
+    });
 
   const countTotalFeedback = state => {
     return Object.values(state).reduce(
